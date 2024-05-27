@@ -1,15 +1,316 @@
-Source: template-repository
-Section: unknown
+Source: remmina
+Section: x11
 Priority: optional
-Maintainer: Tsic404 <liuheng@deepin.org>
-Build-Depends: debhelper (>= 11)
-Standards-Version: 4.1.3
-Homepage: https://github.com/deepin-community/template-repository
-#Vcs-Browser: https://salsa.debian.org/debian/deepin-community-template-repository
-#Vcs-Git: https://salsa.debian.org/debian/deepin-community-template-repository.git
+Maintainer: Debian Remote Maintainers <debian-remote@lists.debian.org>
+Uploaders:
+ Matteo F. Vescovi <mfv@debian.org>
+Build-Depends:
+ cmake (>= 3.5),
+ debhelper-compat (= 13),
+ freerdp2-dev (>= 2.2.0~),
+ intltool,
+ libayatana-appindicator3-dev,
+ libavahi-ui-gtk3-dev (>= 0.6.0),
+ libcups2-dev,
+ libcurl4-openssl-dev,
+ libgcrypt-dev | libgcrypt20-dev,
+ libglib2.0-dev,
+ libgnutls28-dev,
+ libgtk-3-dev,
+ libjpeg-dev,
+ libjson-glib-dev,
+ libkf5wallet-dev,
+ libsecret-1-dev,
+ libsodium-dev,
+ libsoup-3.0-dev,
+ libspice-client-glib-2.0-dev,
+ libspice-client-gtk-3.0-dev,
+ libspice-protocol-dev,
+ libssh-dev (>= 0.8.1),
+ libssl-dev,
+ libvncserver-dev,
+ libvte-2.91-dev,
+ libwebkit2gtk-4.1-dev,
+ libxkbfile-dev,
+ python3-dev
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://www.remmina.org/
+Vcs-Git: https://salsa.debian.org/debian-remote-team/remmina.git
+Vcs-Browser: https://salsa.debian.org/debian-remote-team/remmina
 
-Package: template-repository
+Package: remmina
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Multi-Arch: foreign
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina-common (= ${source:Version}),
+ default-dbus-session-bus | dbus-session-bus
+Recommends:
+ remmina-plugin-rdp,
+ remmina-plugin-vnc,
+ remmina-plugin-secret
+Suggests:
+ remmina-plugin-exec,
+ remmina-plugin-kwallet,
+ remmina-plugin-python,
+ remmina-plugin-spice,
+ remmina-plugin-www,
+ remmina-plugin-x2go
+Description: GTK+ Remote Desktop Client
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+
+Package: remmina-common
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Recommends: remmina
+Description: Common files for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the common files.
+
+Package: remmina-dev
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: Headers for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the development headers for Remmina, to develop
+ new plugins.
+
+Package: remmina-plugin-rdp
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: RDP plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the RDP plugin for Remmina.
+
+Package: remmina-plugin-vnc
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: VNC plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the VNC plugin for Remmina.
+
+Package: remmina-plugin-spice
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version}),
+Description: Spice plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the Spice plugin for Remmina.
+
+Package: remmina-plugin-secret
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Breaks: remmina-plugin-gnome
+Replaces: remmina-plugin-gnome
+Description: Secret plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the secret plugin for Remmina, which
+ allows one to store and retrieve passwords from GNOME Keyring
+ or KWallet.
+
+Package: remmina-plugin-exec
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: EXEC plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the EXEC plugin for Remmina.
+
+Package: remmina-plugin-kwallet
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: KWallet plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the KWallet plugin for Remmina, which
+ allows one to store and retrieve passwords using the KDE wallet.
+
+Package: remmina-plugin-www
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: WWW plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, EXEC and SSH are supported.
+ .
+ This package contains the WWW plugin for Remmina, used to open
+ Web based consoles.
+
+Package: remmina-plugin-kiosk
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ remmina (= ${binary:Version})
+Description: Kiosk plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the Kiosk plugin for Remmina.
+
+Package: remmina-plugin-x2go
+Architecture: any
+Multi-Arch: same
+Depends:
+ pyhoca-cli,
+ remmina (= ${binary:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: X2Go plugin for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the X2Go plugin for Remmina.
+
+Package: remmina-plugin-python
+Architecture: any
+Multi-Arch: same
+Depends:
+ remmina (= ${binary:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: Python support for Remmina
+ Remmina is a remote desktop client written in GTK+, aiming to be
+ useful for system administrators and travellers, who need to work
+ with lots of remote computers in front of either large monitors or
+ tiny netbooks.
+ .
+ Remmina supports multiple network protocols in an integrated and
+ consistent user interface.
+ .
+ Currently RDP, VNC, SPICE, WWW, X2Go, EXEC and SSH are supported.
+ .
+ This package contains the Python API, it can be used to run and
+ develop plugins for Remmina in Python.
