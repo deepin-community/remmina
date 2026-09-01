@@ -13,6 +13,8 @@ package:
     GTK+ Remote Desktop Client
 
 command:
+  - env
+  - GDK_PIXBUF_MODULE_FILE=/opt/apps/org.remmina.remmina/files/lib/gdk-pixbuf-2.0/loaders.cache
   - remmina
 
 base: org.deepin.base/25.2.2
@@ -22,14 +24,17 @@ build: |
   # 下载和安装依赖
   apt -y install --download-only freerdp3-dev intltool libayatana-appindicator3-dev libavahi-ui-gtk3-dev libcups2-dev \
     libcurl4-openssl-dev libgcrypt20-dev libglib2.0-dev libgnutls28-dev libgtk-3-dev libjpeg-dev libjson-glib-dev \
-    libkf5wallet-dev libsecret-1-dev libsodium-dev libsoup-3.0-dev \
+    libkf5wallet-dev librsvg2-common libsecret-1-dev libsodium-dev libsoup-3.0-dev \
     libspice-client-glib-2.0-dev libspice-client-gtk-3.0-dev  libspice-protocol-dev \
     libssh-dev libssl-dev libvncserver-dev libvte-2.91-dev libwebkit2gtk-4.1-dev libxkbfile-dev python3-dev \
     xauth lsb-release xdg-utils \
     quilt
-  bash ./install_dep /var/cache/apt/archives "$PREFIX"
+  bash ./install_dep /var/cache/apt/archives "$PREFIX" "librsvg2-common"
 
   # 应用补丁
+  if [ -s .pc/applied-patches ]; then
+    QUILT_DIR="$PREFIX"/share/quilt QUILT_PATCHES=debian/patches quilt pop -a
+  fi
   QUILT_DIR="$PREFIX"/share/quilt QUILT_PATCHES=debian/patches quilt push -a
 
   # 路径的玲珑适配
@@ -38,6 +43,11 @@ build: |
 
   # 其他替换
   sed -i "s|gnome-terminal|deepin-terminal|g" src/external_tools/launcher.sh
+  # 确保桌面快捷操作也经过设置了 GDK_PIXBUF_MODULE_FILE 的包装脚本
+  sed -i \
+    's|^Exec=@REMMINA_BINARY_PATH@|Exec=remmina-file-wrapper|' \
+    data/desktop/org.remmina.Remmina.desktop.in \
+    data/desktop/org.remmina.Remmina-file.desktop.in
 
   # 构建
   cmake -B build \
@@ -55,6 +65,24 @@ build: |
   cmake --build build -j`nproc`
   cmake --build build --target install >install.log 2>&1
 
+  # 桌面文件会显式启动 remmina-file-wrapper，从而绕过上面的默认 command，
+  # 因此包装脚本也必须设置应用内的 GDK-Pixbuf 加载器缓存。
+  sed -i \
+    '/^export GLADE_HOME=/a export GDK_PIXBUF_MODULE_FILE=/opt/apps/org.remmina.remmina/files/lib/gdk-pixbuf-2.0/loaders.cache' \
+    ${PREFIX}/bin/remmina-file-wrapper
+
+  # Remmina 的自定义图标是 SVG。GDK-Pixbuf 的 SVG 加载器是运行时动态加载的，ldd 无法自动收集，
+  # 因此为应用生成包含运行时加载器和应用内 SVG 加载器的独立缓存。
+  GDK_PIXBUF_QUERY_LOADERS=/usr/lib/${TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+  GDK_PIXBUF_RUNTIME_LOADERS=/usr/lib/${TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
+  GDK_PIXBUF_SVG_LOADER=${PREFIX}/lib/${TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so
+  GDK_PIXBUF_APP_CACHE=${PREFIX}/lib/gdk-pixbuf-2.0/loaders.cache
+  mkdir -p ${PREFIX}/lib/gdk-pixbuf-2.0
+  ${GDK_PIXBUF_QUERY_LOADERS} \
+    ${GDK_PIXBUF_RUNTIME_LOADERS}/*.so \
+    ${GDK_PIXBUF_SVG_LOADER} > ${GDK_PIXBUF_APP_CACHE}
+  sed -i "s|${PREFIX}|/opt/apps/org.remmina.remmina/files|g" ${GDK_PIXBUF_APP_CACHE}
+
   # 项目生成应用名和动态隐式加载的依赖库，ldd无法找到的其他库
   LDD_FILES=(
     remmina
@@ -67,6 +95,7 @@ build: |
     remmina/plugins/remmina-plugin-vnc.so
     remmina/plugins/remmina-plugin-www.so
     remmina/plugins/remmina-plugin-x2go.so
+    gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so
     lsb_release
     xauth
   )
@@ -78,6 +107,7 @@ build: |
   ID_VALUE=$(awk -F ': ' '/^  id: / {print $2}' linglong.yaml)
   echo $PREFIX/bin/lsb_release >> "${ID_VALUE}.install"
   echo $PREFIX/bin/xauth >> "${ID_VALUE}.install"
+  echo $GDK_PIXBUF_APP_CACHE >> "${ID_VALUE}.install"
 
 # allow apt download in build and do apt update
 buildext:
