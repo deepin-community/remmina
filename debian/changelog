@@ -1,3 +1,9 @@
+remmina (1.4.39+dfsg-1deepin3) unstable; urgency=medium
+
+  * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
+
+ -- tunaichao <tunaichao@uniontech.com>  Thu, 10 Sep 2026 20:44:28 +0800
+
 remmina (1.4.39+dfsg-1deepin2) unstable; urgency=medium
 
   * feat: Add support for packaging with Linglong
