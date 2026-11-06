@@ -1,0 +1,46 @@
+From 8b1ba4a861926abe6a50b10f1c91691abeab5ecf Mon Sep 17 00:00:00 2001
+From: wangrong <wangrong@uniontech.com>
+Date: Fri, 6 Nov 2026 14:23:02 +0800
+Subject: [PATCH] fix(editor): reset assistance widget pointers on protocol
+ change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Reset assistance_toggle/file/password and two label pointers to NULL
+when destroying config_container in protocol_combo_on_changed, to
+match the existing reset of server/resolution/ssh_tunnel pointers.
+
+在切换协议销毁 config_container 时，将 assistance_toggle 等 5 个控件
+指针置 NULL，与 server/resolution/ssh_tunnel 等指针的处理保持一致，
+避免切换到无 ASSISTANCE 设置项的协议后产生悬空指针。
+
+Log: 修复切换协议后 assistance 控件悬空指针导致的崩溃
+Influence: 修复从 RDP 切换到无 ASSISTANCE 设置项的协议（如 VNC）后，点
+击保存/连接按钮解引用已释放控件导致的 SIGBUS 崩溃，仅影响连接配置编辑器。
+
+Signed-off-by: wangrong <wangrong@uniontech.com>
+---
+ src/remmina_file_editor.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/remmina_file_editor.c b/src/remmina_file_editor.c
+index e086037..c0753b3 100644
+--- a/src/remmina_file_editor.c
++++ b/src/remmina_file_editor.c
+@@ -1479,6 +1479,12 @@ static void remmina_file_editor_protocol_combo_on_changed(GtkComboBox *combo, Re
+ 	priv->resolution_custom_combo = NULL;
+ 	priv->keymap_combo = NULL;
+ 
++	priv->assistance_toggle = NULL;
++	priv->assistance_file = NULL;
++	priv->assistance_password = NULL;
++	priv->assistance_file_label = NULL;
++	priv->assistance_password_label = NULL;
++
+ 	priv->ssh_tunnel_enabled_check = NULL;
+ 	priv->ssh_tunnel_loopback_check = NULL;
+ 	priv->ssh_tunnel_server_default_radio = NULL;
+-- 
+2.50.1
+
